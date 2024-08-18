@@ -26,7 +26,6 @@
             token = token.replace(/"/g, "");
         }
         else {
-            ShowPromptDialog("Не удалось прочитать токен, возможно, вам потребуется снова войти в систему");
             return;
         }
 
