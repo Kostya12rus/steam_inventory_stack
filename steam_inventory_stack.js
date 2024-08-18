@@ -3,10 +3,11 @@
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
 // @version      0.1
-// @description  Steam Stack Inventory
+// @description  Steam Stack Inventory by Kostya12rus
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
 // @match        https://steamcommunity.com/id/*/inventory*
+// @license      AGPL-3.0
 // ==/UserScript==
 
 (function() {
@@ -330,7 +331,7 @@
         // Настройка наблюдателя
         waitForElement('.name_game').then((target) => {
             observer.observe(target, { childList: true, subtree: true, characterData: true });
-            updateButtonText();
+            updateButtonText(); // Обновление текста кнопки сразу после установки наблюдателя
         });
 
         // Вставка кнопки с логированием
