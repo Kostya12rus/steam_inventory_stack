@@ -2,7 +2,7 @@
 // @name         Steam Stack Inventory
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
-// @version      1.0.1
+// @version      1.0.0
 // @description  Add a button in steam inventory for stack items
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
@@ -152,6 +152,7 @@
 
             const progress = document.createElement('div');
             progress.style.marginTop = '20px';
+            progress.style.position = 'relative';
             modal.appendChild(progress);
 
             const progressBar = document.createElement('div');
@@ -160,6 +161,7 @@
             progressBar.style.backgroundColor = '#333'; // Более темный цвет фона
             progressBar.style.borderRadius = '12px';
             progressBar.style.overflow = 'hidden';
+            progressBar.style.position = 'relative'; // Добавлено позиционирование
             progress.appendChild(progressBar);
 
             const progressFill = document.createElement('div');
@@ -168,12 +170,26 @@
             progressFill.style.backgroundColor = '#008cba'; // Синий цвет для прогресса
             progressFill.style.transition = 'width 0.4s ease';
             progressFill.style.borderRadius = '12px';
+            progressFill.style.position = 'absolute'; // Абсолютное позиционирование для заполнения
+            progressFill.style.top = '0';
+            progressFill.style.left = '0';
             progressBar.appendChild(progressFill);
+
+            const progressBarText = document.createElement('span');
+            progressBarText.style.position = 'absolute';
+            progressBarText.style.top = '50%';
+            progressBarText.style.left = '50%';
+            progressBarText.style.transform = 'translate(-50%, -50%)';
+            progressBarText.style.fontSize = '14px';
+            progressBarText.style.color = '#ffffff';
+            progressBarText.style.zIndex = '1';
+            progressBarText.style.pointerEvents = 'none'; // Чтобы текст не перекрывал клики
+            progressBar.appendChild(progressBarText);
 
             const progressText = document.createElement('div');
             progressText.style.marginTop = '15px';
             progressText.style.fontSize = '16px';
-            progressText.style.color = '#f0f0f0'; // Светло-серый цвет для текста
+            progressText.style.color = '#f0f0f0';
             progressText.innerText = `0 of ${totalItems} items processed`;
             modal.appendChild(progressText);
 
@@ -217,8 +233,9 @@
                 modal.style.opacity = '1';
             });
 
-            return { modal, progressFill, progressText, countdownText, overlay };
+            return { modal, progressFill, progressText, countdownText, overlay, progressBarText };
         }
+
 
         // Функция для закрытия всплывающего окна с обратным отсчетом
         function startCountdownAndClose(overlay, modal, countdownText) {
@@ -242,9 +259,10 @@
         }
 
         // Функция для обновления прогресса
-        function updateProgressModal({ progressFill, progressText }, processedItems, totalItems) {
-            const progressPercentage = Math.round((processedItems / totalItems) * 100);
+        function updateProgressModal({ progressFill, progressText, progressBarText }, processedItems, totalItems) {
+            const progressPercentage = ((processedItems / totalItems) * 100).toFixed(1);
             progressFill.style.width = `${progressPercentage}%`;
+            progressBarText.innerText = `${progressPercentage}%`;
             progressText.innerText = `${processedItems} of ${totalItems} items processed`;
         }
 
