@@ -2,7 +2,7 @@
 // @name         Steam Stack Inventory
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
-// @version      1.0.0
+// @version      1.0.1
 // @description  Add a button in steam inventory for stack items
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
@@ -21,14 +21,6 @@
         let inProgress = false;
         if (userSteamID !== m_steamid) return;
 
-        let token = document.querySelector("#application_config")?.getAttribute("data-loyalty_webapi_token");
-        if (token) {
-            token = token.replace(/"/g, "");
-        }
-        else {
-            return;
-        }
-
         const button = document.createElement("button");
         button.innerText = "Stack Inventory";
         button.classList.add("btn_darkblue_white_innerfade");
@@ -46,7 +38,7 @@
             await startStackInventory()
             inProgress = false;
         });
-        async function stackItem(item, leaderItem) {
+        async function stackItem(item, leaderItem, token) {
             const { amount, id: fromitemid } = item;
             const { id: destitemid } = leaderItem;
             const {m_appid, m_steamid} = g_ActiveInventory;
@@ -74,6 +66,13 @@
             }
         }
         async function startStackInventory() {
+            let token = document.querySelector("#application_config")?.getAttribute("data-loyalty_webapi_token");
+            if (token) {
+                token = token.replace(/"/g, "");
+            }
+            else {
+                return;
+            }
             const inventory = await getFullInventory();
             const totalItems = Object.values(inventory).reduce((sum, instanceDict) => {
                 return sum + Object.values(instanceDict).reduce((instanceSum, items) => {
@@ -103,7 +102,7 @@
                             }
                             for (const item of items) {
                                 if (item === leaderItem) continue;
-                                stackItem(item, leaderItem);
+                                stackItem(item, leaderItem, token);
                                 processedItems++;
                                 updateProgressModal(progressModal, processedItems, totalItems);
                                 await new Promise(resolve => setTimeout(resolve, 75));
@@ -125,80 +124,83 @@
             overlay.style.height = '100%';
             overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
             overlay.style.zIndex = '9999';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.transition = 'opacity 0.3s ease-in-out';
+            overlay.style.opacity = '0';
 
             const modal = document.createElement('div');
-            modal.style.position = 'fixed';
-            modal.style.top = '50%';
-            modal.style.left = '50%';
-            modal.style.transform = 'translate(-50%, -50%)';
-            modal.style.padding = '20px';
-            modal.style.backgroundColor = '#2c2c2c';
-            modal.style.borderRadius = '8px';
-            modal.style.boxShadow = '0 0 15px rgba(0, 0, 0, 0.5)';
-            modal.style.zIndex = '10000';
+            modal.style.padding = '30px';
+            modal.style.backgroundColor = '#242424'; // Темно-серый цвет с легким оттенком
+            modal.style.borderRadius = '12px';
+            modal.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.5)';
             modal.style.textAlign = 'center';
-            modal.style.color = '#fff';
+            modal.style.color = '#e0e0e0'; // Светло-серый цвет для текста
             modal.style.width = '500px';
+            modal.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+            modal.style.transform = 'scale(0.9)';
+            modal.style.opacity = '0';
 
             const title = document.createElement('h3');
             title.innerText = 'Stacking Inventory Items...';
-            title.style.margin = '0 0 10px 0';
-            title.style.fontSize = '18px';
+            title.style.marginBottom = '15px';
+            title.style.fontSize = '22px'; // Немного увеличен размер шрифта
             title.style.fontWeight = 'bold';
+            title.style.color = '#ffffff'; // Белый цвет для заголовка
             modal.appendChild(title);
 
             const progress = document.createElement('div');
-            progress.style.marginTop = '10px';
+            progress.style.marginTop = '20px';
             modal.appendChild(progress);
 
             const progressBar = document.createElement('div');
             progressBar.style.width = '100%';
-            progressBar.style.height = '20px';
-            progressBar.style.backgroundColor = '#444';
-            progressBar.style.borderRadius = '4px';
+            progressBar.style.height = '24px';
+            progressBar.style.backgroundColor = '#333'; // Более темный цвет фона
+            progressBar.style.borderRadius = '12px';
             progressBar.style.overflow = 'hidden';
             progress.appendChild(progressBar);
 
             const progressFill = document.createElement('div');
             progressFill.style.height = '100%';
             progressFill.style.width = '0%';
-            progressFill.style.backgroundColor = '#4caf50';
-            progressFill.style.borderRadius = '4px';
+            progressFill.style.backgroundColor = '#008cba'; // Синий цвет для прогресса
+            progressFill.style.transition = 'width 0.4s ease';
+            progressFill.style.borderRadius = '12px';
             progressBar.appendChild(progressFill);
 
             const progressText = document.createElement('div');
-            progressText.style.marginTop = '10px';
-            progressText.style.fontSize = '14px';
-            progressText.style.height = '20px';
+            progressText.style.marginTop = '15px';
+            progressText.style.fontSize = '16px';
+            progressText.style.color = '#f0f0f0'; // Светло-серый цвет для текста
             progressText.innerText = `0 of ${totalItems} items processed`;
             modal.appendChild(progressText);
 
-            // Добавляем уникальный div для обратного отсчета
             const countdownText = document.createElement('div');
-            countdownText.style.marginTop = '15px';
-            countdownText.style.fontSize = '14px';
-            countdownText.style.color = '#ffcc00';  // Используем желтый цвет для привлечения внимания
+            countdownText.style.marginTop = '20px';
+            countdownText.style.fontSize = '16px';
+            countdownText.style.color = '#ffcc00';  // Желтый цвет для обратного отсчета
             modal.appendChild(countdownText);
 
-            // Добавляем кнопку OK
             const closeButton = document.createElement('button');
             closeButton.innerText = 'Close';
-            closeButton.style.marginTop = '20px';
-            closeButton.style.padding = '10px 20px';
-            closeButton.style.backgroundColor = '#4caf50';
+            closeButton.style.marginTop = '25px';
+            closeButton.style.padding = '12px 24px';
+            closeButton.style.backgroundColor = '#008cba'; // Синий цвет для кнопки
             closeButton.style.border = 'none';
-            closeButton.style.borderRadius = '4px';
-            closeButton.style.color = '#fff';
-            closeButton.style.fontSize = '14px';
+            closeButton.style.borderRadius = '8px';
+            closeButton.style.color = '#fff'; // Белый цвет для текста кнопки
+            closeButton.style.fontSize = '16px';
             closeButton.style.cursor = 'pointer';
-            closeButton.style.transition = 'background-color 0.3s';
+            closeButton.style.transition = 'background-color 0.3s ease';
 
             closeButton.onmouseover = () => {
-                closeButton.style.backgroundColor = '#45a049';
+                closeButton.style.backgroundColor = '#0077a3'; // Более темный синий при наведении
             };
 
             closeButton.onmouseout = () => {
-                closeButton.style.backgroundColor = '#4caf50';
+                closeButton.style.backgroundColor = '#008cba'; // Возвращаем исходный цвет
             };
 
             closeButton.onclick = () => closeProgressModal(overlay);
@@ -207,6 +209,13 @@
 
             overlay.appendChild(modal);
             document.body.appendChild(overlay);
+
+            // Плавное появление оверлея и модального окна
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                modal.style.transform = 'scale(1)';
+                modal.style.opacity = '1';
+            });
 
             return { modal, progressFill, progressText, countdownText, overlay };
         }
