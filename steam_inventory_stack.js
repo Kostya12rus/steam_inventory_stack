@@ -2,7 +2,7 @@
 // @name         Steam Stack Inventory
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
-// @version      1.0.0
+// @version      1.0.1
 // @description  Add a button in steam inventory for stack items
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
