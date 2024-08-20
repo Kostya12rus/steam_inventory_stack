@@ -658,11 +658,11 @@ class ModalWindow {
     addInventoryTable() {
         this.table = document.createElement('table');
         this.table.style.width = '100%';
-        this.table.style.borderCollapse = 'separate'; // Для возможности использования spacing
-        this.table.style.borderSpacing = '0'; // Убираем промежутки между ячейками
-        this.table.style.borderRadius = '8px'; // Округлые углы для таблицы
-        this.table.style.overflow = 'hidden'; // Обрезаем содержимое по краям таблицы
-        this.table.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)'; // Тень для таблицы
+        this.table.style.borderCollapse = 'separate';
+        this.table.style.borderSpacing = '0';
+        this.table.style.borderRadius = '8px';
+        this.table.style.overflow = 'hidden';
+        this.table.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
 
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
@@ -766,7 +766,7 @@ class ModalWindow {
     }
 
     addItem(newItem) {
-        if (!newItem) { return; }
+        if (!newItem || newItem.getName() === '') { return; }
 
         this.items.push(newItem);
         this.addItemToTable(newItem);
@@ -804,8 +804,8 @@ class ModalWindow {
             return;
         }
 
-        const nickNameElement = document.querySelector('a.whiteLink.persona_name_text_content');
-        const avatarUrlElement = document.querySelector('.profile_small_header_avatar img');
+        const nickNameElement = document.querySelector('.profile_small_header_name > a');
+        const avatarUrlElement = document.querySelector('.profile_small_header_avatar .playerAvatar > img');
 
         const nickName = nickNameElement ? nickNameElement.textContent.trim() : '';
         const avatarUrl = avatarUrlElement ? avatarUrlElement.src : '';
@@ -820,9 +820,6 @@ class ModalWindow {
     }
 
     function createButton() {
-        let inProgress = false;
-        let loadedGameInventoryTimer = new Date().getTime();
-
         const button = document.createElement("button");
         button.innerText = "All Items Table";
         button.classList.add("btn_darkblue_white_innerfade");
@@ -834,17 +831,35 @@ class ModalWindow {
         button.style.zIndex = "2";
 
         button.addEventListener("click", async function() {
-            if (inProgress) return;
-            if (loadedGameInventoryTimer > new Date().getTime()) return;
-            inProgress = true;
-            await localAppData();
-            inProgress = false;
+            if (button.disabled) return;
+            button.disabled = true;
+            try { await localAppData(); }
+            catch (error) { console.error(error); }
+            button.disabled = false;
         });
         function updateButtonText() {
             const gameNameElement = document.querySelector('.name_game');
             if (gameNameElement) {
-                button.innerText = "All Items Table in " + gameNameElement.textContent.trim();
-                loadedGameInventoryTimer = new Date().getTime() + 5 * 1000;
+                button.disabled = true;
+                let remainingTime = 5;
+                const gameName = gameNameElement.textContent.trim();
+
+                button.innerText = `All Items Table in ${gameName} (wait ${remainingTime} sec)`;
+                const timer = setInterval(() => {
+                    if (gameName !== gameNameElement.textContent.trim()) {
+                        clearInterval(timer);
+                        return;
+                    }
+
+                    remainingTime--;
+                    button.innerText = `All Items Table in ${gameName} (wait ${remainingTime} sec)`;
+
+                    if (remainingTime <= 0) {
+                        clearInterval(timer);
+                        button.innerText = `All Items Table in ${gameName}`;
+                        button.disabled = false;
+                    }
+                }, 1000);
             }
         }
         function waitForElement(selector) {
