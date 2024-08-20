@@ -3,7 +3,7 @@
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
 // @version      1.0.0
-// @description  Shows you all your stuff in a cool way.
+// @description  Shows you all your items in a cool way.
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
 // @match        https://steamcommunity.com/id/*/inventory*
