@@ -262,7 +262,8 @@
         function updateProgressModal({ progressFill, progressText, progressBarText }, processedItems, totalItems) {
             const progressPercentage = ((processedItems / totalItems) * 100).toFixed(1);
             progressFill.style.width = `${progressPercentage}%`;
-            progressBarText.innerText = `${progressPercentage}%`;
+            const timeLeft = (((totalItems-processedItems)*0.075).toFixed(1));
+            progressBarText.innerText = `${progressPercentage}% (~${timeLeft} sec)`;
             progressText.innerText = `${processedItems} of ${totalItems} items processed`;
         }
 
