@@ -2,7 +2,7 @@
 // @name         Steam Inventory Items Table
 // @namespace    https://github.com/Kostya12rus/steam_inventory_stack/
 // @supportURL   https://github.com/Kostya12rus/steam_inventory_stack/issues
-// @version      1.0.0
+// @version      1.0.1
 // @description  Shows you all your items in a cool way.
 // @author       Kostya12rus
 // @match        https://steamcommunity.com/profiles/*/inventory*
@@ -537,6 +537,7 @@ class ModalWindow {
         this.overlay.style.alignItems = 'center';
         this.overlay.style.opacity = '0';
         this.overlay.style.transition = 'opacity 0.3s ease-in-out';
+        this.overlay.addEventListener('click', this.closeModal.bind(this));
 
         this.modal.style.padding = '30px';
         this.modal.style.backgroundColor = '#242424';
@@ -544,12 +545,13 @@ class ModalWindow {
         this.modal.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.5)';
         this.modal.style.color = '#e0e0e0';
         this.modal.style.width = '800px';
-        this.modal.style.maxHeight = '80vh';
+        this.modal.style.maxHeight = '90vh';
         this.modal.style.overflowY = 'auto';
         this.modal.style.position = 'relative';
         this.modal.style.transform = 'scale(0.9)';
         this.modal.style.opacity = '0';
         this.modal.style.transition = 'transform 0.3s ease-in-out, opacity 0.3s ease-in-out';
+        this.modal.addEventListener('click', function(event) { event.stopPropagation(); });
 
         this.closeButton.innerText = '✖';
         this.closeButton.style.position = 'absolute';
